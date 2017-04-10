@@ -1,0 +1,11 @@
+name: greedy
+title: greedy
+account: jvoisey
+server: shinyapps.io
+appId: 170907
+bundleId: 782557
+url: https://jvoisey.shinyapps.io/greedy/
+when: 1491759084.1577
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|riskMeans.R

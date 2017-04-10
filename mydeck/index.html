@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Greedy</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Greedy">
+  <meta name="author" content="Jeremy Voisey">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Greedy</h1>
+    <h2>Risk and Reward</h2>
+    <p>Jeremy Voisey<br/>Data Science Student</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <article data-timings="">
+    <style>
+.title-slide {
+  background-color: #ffad33; 
+}
+.title-slide hgroup > h1 {
+color: #b30000;
+font-family: 'Times';
+}
+.title-slide hgroup > h2 {
+color: #b30000;
+font-family: 'Times';
+}
+slide:not(.segue)  h2 {
+color: #b30000;
+font-family: 'Times';
+}
+</style>
+
+<h2>Introduction</h2>
+
+<p><center><img src = "assets/img/dice-png-27646.jpg" height = "150px"></center></p>
+
+<p>In the simple dice game called &#39;Greedy&#39;, you roll the dice as many times as you like, accumulatng your score. 
+But if you get too greedy and don&#39;t stop before you roll a 6, you lose everything!</p>
+
+<p>In this simulation, you can set the following:</p>
+
+<ul>
+<li>Minimum score to aim for (i.e. you stop rolling when it is reached)</li>
+<li>Number of games to simulate</li>
+<li>Attempting to beat the best previous score. e.g. A group of friends trying to beat each other.</li>
+</ul>
+
+<p>The point of the simulation is to demonstrate the best strategy to do well in this game.</p>
+
+<p>Being too greedy (taking too much risk) results in poor reward.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>How it works</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A single game is simulated with the following code:</p>
+
+<pre><code class="r">        repeat{
+            roll &lt;- sample(1:6,1) #Dice roll
+            if (roll == 6) { # Greedy, game over, score is zero
+                score &lt;- 0
+                break
+            } else {
+                score &lt;- score + roll # Accumulate score
+            }
+            if ((!beatPrevious &amp; score &gt;= risk) | (score &gt;= risk &amp; score &gt; best)){
+                break
+            }
+        }
+</code></pre>
+
+<p>This code is within the greedyResults function</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Example</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A call to this function, with a risk (minumum score aimed for) of 12 and 10 simulations:</p>
+
+<pre><code class="r">greedyResults(12, 10, FALSE)
+</code></pre>
+
+<pre><code>##  [1]  0 12 14 12  0  0  0 12 15 12
+</code></pre>
+
+<p>In the shiny app, the results are:
+1) Saved in a data.frame
+2) The final outcome (winner or greedy loser) is added
+3) The results are then displayed as a bar chart, with the mean score obtained stated.</p>
+
+<pre><code class="r">set.seed(123)
+gScores &lt;- greedyResults(12, 50, FALSE)
+# Form data.frame with scores
+greedyScores &lt;- data.frame(score = gScores)
+# Add end outcome
+greedyScores$Outcome &lt;- ifelse(greedyScores$score == 0, &quot;Greedy&quot;, &quot;Winner&quot;)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">library(ggplot2)
+meanscore &lt;- mean(greedyScores$score)
+        ggplot(greedyScores, aes(x = factor(score), fill = Outcome)) +
+            geom_bar() +
+            scale_fill_manual(values=c(&quot;#BB2222&quot;, &quot;#22BB22&quot;)) +
+            labs(title = paste(&quot;Scores for&quot;, 50, &quot;simulated games&quot;), x = &quot;Score&quot;, y = &quot;Count&quot;, subtitle = paste(&quot;Mean score = &quot;, meanscore)) +
+            theme(plot.title = element_text(size = 18, face = &quot;bold&quot;), plot.subtitle = element_text(size = 14))
+</code></pre>
+
+<p><img src="figure/plot-1.png" alt="plot of chunk plot"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='NA'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='How it works'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Example'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='NA'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
